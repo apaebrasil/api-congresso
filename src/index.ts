@@ -33,6 +33,7 @@ app.register(ScalarApiReference, {
 
 app.get("/", () => {
   console.log("Hello Docker api");
+  return { message: "HEllo Docler api" };
 });
 
 app.listen({ port: 3000, host: "0.0.0.0" }).then(() => {

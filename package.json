@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "start": "node dist/server.js",
+    "start": "node dist/index.js",
     "format": "biome format --write",
     "build": "tsc"
   },
@@ -26,12 +26,5 @@
     "fastify": "^5.8.5",
     "fastify-type-provider-zod": "^6.1.0",
     "zod": "^4.4.3"
-  },
-  "devEngines": {
-    "runtime": {
-      "name": "node",
-      "version": "22.x",
-      "onFail": "download"
-    }
   }
 }
