@@ -3,6 +3,7 @@ import { serializerCompiler, validatorCompiler, jsonSchemaTransform, type ZodTyp
 import { fastifySwagger } from "@fastify/swagger";
 import { fastifyCors } from "@fastify/cors";
 import ScalarApiReference from "@scalar/fastify-api-reference";
+import { Queue } from "bullmq";
 
 const app = fastify().withTypeProvider<ZodTypeProvider>();
 
