@@ -3,16 +3,17 @@ import { serializerCompiler, validatorCompiler, jsonSchemaTransform, type ZodTyp
 import { fastifySwagger } from "@fastify/swagger";
 import { fastifyCors } from "@fastify/cors";
 import ScalarApiReference from "@scalar/fastify-api-reference";
-import { Queue } from "bullmq";
+import z from "zod";
+import { exemplePost } from "./interface/routes/exemple.js";
 
-const app = fastify().withTypeProvider<ZodTypeProvider>();
+const app = fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 
 app.register(fastifyCors, {
   origin: "*",
-  methods: ["GET", "POST", "PUT", "PATH", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   // credentials: true, // permite que envie automaticamente os cookies que estão no cabeçalho do frontned para o backend caso esteja na mesma URL
 });
 
@@ -32,10 +33,36 @@ app.register(ScalarApiReference, {
   routePrefix: "/docs",
 });
 
-app.get("/", () => {
-  console.log("Hello Docker api");
-  return { message: "HEllo Docler api" };
+app.register(async (instance) => {
+  const sumSchema = z.object({
+    a: z.coerce.number(),
+    b: z.coerce.number(),
+  });
+
+  instance.withTypeProvider<ZodTypeProvider>().get(
+    "/sum",
+    {
+      schema: {
+        tags: ["Matemática"],
+        summary: "Calcula a soma de dois números",
+        querystring: sumSchema,
+        response: {
+          200: z.object({
+            result: z.number(),
+          }),
+        },
+      },
+    },
+    async (request, reply) => {
+      const { a, b } = request.query;
+      const result = a + b;
+      return { result };
+    },
+  );
 });
+
+app.register(exemplePost);
+app.ready();
 
 app.listen({ port: 3000, host: "0.0.0.0" }).then(() => {
   console.log("Servidor HTTP rodando no http://localhost:3000");

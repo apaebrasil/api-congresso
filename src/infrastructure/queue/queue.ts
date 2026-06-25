@@ -1,15 +1,23 @@
 import { redisConection } from "@/config/redis.js";
 import { Queue, QueueEvents } from "bullmq";
+import z from "zod";
+
+const webHookSchema = z.object({
+  urlDestino: z.string().url(),
+  payload: z.record(z.any(), z.any()),
+});
+
+export type WebHookJobData = z.infer<typeof webHookSchema>;
 
 export const QUEUE_NAME = "orders";
 
-export const orderQueue = new Queue(QUEUE_NAME, {
+export const orderQueue = new Queue<WebHookJobData>(QUEUE_NAME, {
   connection: redisConection,
   defaultJobOptions: {
     attempts: 3,
     backoff: {
       type: "exponential",
-      delay: 2000,
+      delay: 5000,
     },
     removeOnComplete: {
       age: 60 * 60 * 24,
